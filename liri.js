@@ -5,8 +5,6 @@ var keys = require("./keys.js");
 var command = process.argv[2];
 var query = process.argv[3]; //need to probably add 4 in here also or & for movies/songs with more than one word
 
-// Functions for 3 main functions of the app
-// 	--> do-what-it-says requires the use of functions
 var myTweets = function () {
 	// Load twitter module from npm
 	var Twitter = require('twitter');
