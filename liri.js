@@ -3,7 +3,7 @@ var keys = require("./keys.js");
 
 // node liri.js [ command ] [ query - optional ]
 var command = process.argv[2];
-var query = process.argv[3];
+var query = process.argv[3]; //need to probably add 4 in here also or & for movies/songs with more than one word
 
 // Functions for 3 main functions of the app
 // 	--> do-what-it-says requires the use of functions
@@ -12,17 +12,17 @@ var myTweets = function () {
 	var Twitter = require('twitter');
 	//Passes Twitter keys into call to Twitter API.
 	var client = new Twitter(keys.twitter);
-	// Twitter API parameters
+	// Twitter parameters
 	var params = {
-		screen_name: 'meliallen1',
+		screen_name: 'meliallen1', //personal account screen name
 		count: 20
 	};
 
-	// GET request for last 20 tweets on my account's timeline
+	// GET request for last 20 tweets on my personal account's timeline
 	client.get('statuses/user_timeline', params, function (error, tweets, response) {
-		if (error) { // if there IS an error
+		if (error) { 
 			console.log('Error occurred: ' + error);
-		} else { // if there is NO error
+		} else {
 			console.log("My 20 Most Recent Tweets");
 			console.log("");
 
@@ -38,21 +38,22 @@ var myTweets = function () {
 var spotifyThisSong = function (trackQuery) {
 	// Load Spotify npm package
 	var Spotify = require('node-spotify-api');
+	//connect keys for spotify from key and .env
 	var spotify = new Spotify(keys.spotify);
 
-	// if no trackQuery is passed in, then we will be querying for this particular song
+	// if no query is entered this will be used
 	if (trackQuery === undefined) {
 		trackQuery = "the sign ace of base";
 	}
 
-	// Spotify API request (if an object is returned, output the first search result's artist(s), song, preview link, and album)
+	// Spotify API request 
 	spotify.search({
 		type: 'track',
 		query: trackQuery
 	}, function (err, data) {
-		if (err) { // if error
+		if (err) {
 			return console.log('Error occurred: ' + err);
-		} else { // if no error
+		} else { 
 			// For loop is for when a track has multiple artists
 			for (var i = 0; i < data.tracks.items[0].artists.length; i++) {
 				if (i === 0) {
@@ -73,9 +74,10 @@ var spotifyThisSong = function (trackQuery) {
 var movieThis = function (movieQuery) {
 	// Load request npm module
 	var request = require("request");
+	// connect apikey for omdb
 	var apikey = keys.omdb.id;
-
-	// if query that is passed in is undefined, Mr. Nobody becomes the default
+	
+	// if nothing entered for query or undefined, Mr. Nobody becomes the default
 	movieQuery = query;
 	if (movieQuery === undefined) {
 		movieQuery = "Mr Nobody";
@@ -83,10 +85,12 @@ var movieThis = function (movieQuery) {
 
 	// HTTP GET request
 	request("http://www.omdbapi.com/?t=" + movieQuery + "&y=&plot=short&r=json&apikey=" + apikey, function (error, response, body) {
+		var rottentomatorating = JSON.parse(body).Ratings[1].Value; //variable for rotten tomator rating since it is buried under ratings and sources to retrieve data
 		if (!error && response.statusCode === 200) {
 			console.log("* Title of the movie:         " + JSON.parse(body).Title);
 			console.log("* Year the movie came out:    " + JSON.parse(body).Year);
 			console.log("* IMDB Rating of the movie:   " + JSON.parse(body).imdbRating);
+			console.log("* Rotten Tomato Rating of the movie:   " + rottentomatorating);
 			console.log("* Country produced:           " + JSON.parse(body).Country);
 			console.log("* Language of the movie:      " + JSON.parse(body).Language);
 			console.log("* Plot of the movie:          " + JSON.parse(body).Plot);
@@ -95,7 +99,7 @@ var movieThis = function (movieQuery) {
 	});
 }
 
-// App functionality due to user input
+// commands typed into terminal
 if (command === "my-tweets") {
 	myTweets();
 } else if (command === "spotify-this-song") {
@@ -104,7 +108,7 @@ if (command === "my-tweets") {
 	movieThis(query);
 } else if (command === "do-what-it-says") {
 
-	// App functionality from file read / loads fs npm package for do what it says command
+	// incorporating from file read / loads fs npm package for do what it says command
 	var fs = require("fs");
 
 	fs.readFile("random.txt", "utf-8", function (error, data) {
@@ -112,7 +116,7 @@ if (command === "my-tweets") {
 		var query;
 
 		// split the string from file in order to differentiate between the command and query for do what it says
-		// 	--> if there is no comma, then only the command is considered (my-tweets)
+		// 	--> if there is no comma, then defaults to (my-tweets)
 		if (data.indexOf(",") !== -1) {
 			var dataArr = data.split(",");
 			command = dataArr[0];
@@ -132,8 +136,8 @@ if (command === "my-tweets") {
 			console.log("Command from file is not a valid command! Please try again.")
 		}
 	});
-} else if (command === undefined) { // use case where no command is given
+} else if (command === undefined) { // use case where no command is entered
 	console.log("Please enter a command to run LIRI.")
-} else { // use case where command is given but not recognized
+} else { // use case where command is entered but does not match
 	console.log("Command not recognized! Please try again.")
 }
