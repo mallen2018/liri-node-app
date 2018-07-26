@@ -1,3 +1,5 @@
+# liri-node-app
+
 Liri.js will take in commands and pull back information from Twitter API, Spotify API, and OMDB API
 
 commands:   node liri.js my-tweets
